@@ -1,5 +1,6 @@
 import argparse
 import time
+import os
 from concurrent.futures import ThreadPoolExecutor
 
 import requests
@@ -52,11 +53,23 @@ def parse_args():
     parser.add_argument('--all', action='store_true', help=msg['all'])
     parser.add_argument('--pdf', action='store_true', help=msg['pdf'])
     parser.add_argument('--mail', action='store_true', help=msg['mail'])
-    parser.add_argument('-o', '--output', type=str, default='./download', help=msg['output'])
+    parser.add_argument('-o', '--output', type=str, default=get_download_path(), help=msg['output'])
     parser.add_argument('--site', type=str, default='ishuhui', choices=('qq', 'ishuhui'), help=msg['site'])
     args = parser.parse_args()
     return args
 
+
+def get_download_path():
+    """Returns the default downloads path for linux or windows"""
+    if os.name == "nt":
+        import winreg
+        sub_key = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders"
+        downloads_guid = "{374DE290-123F-4565-9164-39C4925E467B}"
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, sub_key) as key:
+            location = winreg.QueryValueEx(key, downloads_guid)[0]
+        return location
+    else:
+        return os.path.join(os.path.expanduser("~"), "downloads")
 
 def create_session(pool_connections=10, pool_maxsize=10, max_retries=0):
     session = requests.Session()

@@ -23,7 +23,7 @@ def download_chapter(comic_title, chapter_number, chapter_title, chapter_pics,
     site_name = safe_filename(site_name)
     comic_title = safe_filename(comic_title)
     if chapter_number:
-        chapter_title = '第{}话 {}'.format(chapter_number, chapter_title)
+        chapter_title = 'op{}'.format(chapter_number)
     chapter_title = safe_filename(chapter_title)
 
     chapter_dir = os.path.join(output, site_name, comic_title, chapter_title)
