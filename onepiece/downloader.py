@@ -46,6 +46,8 @@ def download_chapter(comic_title, chapter_number, chapter_title, chapter_pics,
 
     zip_all_files(chapter_dir)
 
+    print("all tasks finished.")
+
     if is_generate_pdf or is_send_email:
         from .utils.img2pdf import image_dir_to_pdf
         pdf_dir = os.path.join(output, site_name, 'pdf - {}'.format(comic_title))
@@ -69,12 +71,16 @@ def download_chapter(comic_title, chapter_number, chapter_title, chapter_pics,
                        file_list=[pdf_path])
     return chapter_dir
 
+
 def zip_all_files(dir):
     os.chdir(dir)
     all_files = os.listdir()
-    print(all_files)
+    if len(all_files) == 0:
+        return
+
     zip_file_name = path.basename(dir) + ".zip"
     print("zipping files in {}, file: {}".format(dir, zip_file_name))
     with zipfile.ZipFile(zip_file_name, "w") as myzip:
         for img_file in all_files:
             myzip.write(img_file)
+            os.remove(img_file)
