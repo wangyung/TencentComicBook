@@ -74,11 +74,12 @@ def download_chapter(comic_title, chapter_number, chapter_title, chapter_pics,
 
 def zip_all_files(dir):
     os.chdir(dir)
-    all_files = os.listdir()
+    all_files = [file for file in os.listdir() if file.endswith(".png") or file.endswith(".jpg")]
     if len(all_files) == 0:
         return
 
     zip_file_name = path.basename(dir) + ".zip"
+
     print("zipping files in {}, file: {}".format(dir, zip_file_name))
     with zipfile.ZipFile(zip_file_name, "w") as myzip:
         for img_file in all_files:
