@@ -38,7 +38,11 @@ class QQComicBook:
         """
         url = 'http://ac.qq.com/Comic/ComicInfo/id/{}'.format(comicid)
         html = self.get_html(url)
-        ol = re.search(r'''(<ol class="chapter-page-all works-chapter-list".+?</ol>)''', html, re.S).group()
+        match = re.search(r'''(<ol class="chapter-page-all works-chapter-list".+?</ol>)''', html, re.S)
+        if match is None:
+            print("Couldn't find the latest chapter.")
+            return
+        ol = match.group()
         all_atag = re.findall(r'''<a.*?title="(.*?)".*?href="(.*?)">(.*?)</a>''', ol, re.S)
         all_chapter = {}
         for item in all_atag:
@@ -86,6 +90,9 @@ class QQComicBook:
                 }
         """
         all_chapter = self.get_all_chapter(comicid)
+        if all_chapter is None:
+            return list()
+
         max_chapter_number = max(all_chapter.keys())
         if is_download_all:
             return list(all_chapter.values())

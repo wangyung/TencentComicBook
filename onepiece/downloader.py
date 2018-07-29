@@ -1,4 +1,6 @@
 import os
+import zipfile
+from os import path
 
 from .utils import safe_filename
 
@@ -28,19 +30,22 @@ def download_chapter(comic_title, chapter_number, chapter_title, chapter_pics,
     if not os.path.exists(chapter_dir):
         os.makedirs(chapter_dir)
 
-    print('正在下载', chapter_title)
+    print('downloading...', chapter_title)
     for idx, img_url in enumerate(chapter_pics, start=1):
         suffix = img_url.rsplit('.', 1)[-1]
-        img_path = os.path.join(chapter_dir, '{}.{}'.format(idx, suffix))
+        img_path = os.path.join(chapter_dir, '{}.{}'.format(str(idx).zfill(3), suffix))
         if os.path.exists(img_path) and os.path.getsize(img_path) != 0:
-            print('图片已存在, pass', img_path)
+            print("picture already existed, pass", img_path)
             continue
         try:
             response = session.get(img_url)
             with open(img_path, 'wb') as f:
                 f.write(response.content)
         except Exception as e:
-            raise Exception('这张图片下载出错', chapter_title, img_url, str(e))
+            raise Exception("download error", chapter_title, img_url, str(e))
+
+    zip_all_files(chapter_dir)
+
     if is_generate_pdf or is_send_email:
         from .utils.img2pdf import image_dir_to_pdf
         pdf_dir = os.path.join(output, site_name, 'pdf - {}'.format(comic_title))
@@ -63,3 +68,13 @@ def download_chapter(comic_title, chapter_number, chapter_title, chapter_pics,
                        content=None,
                        file_list=[pdf_path])
     return chapter_dir
+
+def zip_all_files(dir):
+    os.chdir(dir)
+    all_files = os.listdir()
+    print(all_files)
+    zip_file_name = path.basename(dir) + ".zip"
+    print("zipping files in {}, file: {}".format(dir, zip_file_name))
+    with zipfile.ZipFile(zip_file_name, "w") as myzip:
+        for img_file in all_files:
+            myzip.write(img_file)

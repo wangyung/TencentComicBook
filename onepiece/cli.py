@@ -44,7 +44,8 @@ def parse_args():
 可以参照onepiece/config.py.example文件，创建并修改onepiece/config.py文件',
     }
     parser = argparse.ArgumentParser()
-    parser.add_argument('-id', '--comicid', type=int, default=505430, help=msg['comicid'])
+    #if qq, the id should be 505430
+    parser.add_argument('-id', '--comicid', type=int, default=1, help=msg['comicid'])
     parser.add_argument('-i', '--interval', type=str, help=msg['interval'])
     parser.add_argument('-c', '--chapter', type=int, default=-1, help=msg['chapter'])
     parser.add_argument('-t', '--thread', type=int, default=8, help=msg['thread'])
@@ -52,7 +53,7 @@ def parse_args():
     parser.add_argument('--pdf', action='store_true', help=msg['pdf'])
     parser.add_argument('--mail', action='store_true', help=msg['mail'])
     parser.add_argument('-o', '--output', type=str, default='./download', help=msg['output'])
-    parser.add_argument('--site', type=str, default='qq', choices=('qq', 'ishuhui'), help=msg['site'])
+    parser.add_argument('--site', type=str, default='ishuhui', choices=('qq', 'ishuhui'), help=msg['site'])
     args = parser.parse_args()
     return args
 
@@ -79,7 +80,7 @@ def main():
     session = create_session(pool_maxsize=args.thread, pool_connections=args.thread, max_retries=3)
     ts = time.time()
     begin_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(ts))
-    print('任务开始咯\n现在时间是:', begin_time)
+    print("starting download task\ncurrent time is:", begin_time)
 
     with ThreadPoolExecutor(max_workers=args.thread) as executor:
         for data in task:
@@ -94,7 +95,7 @@ def main():
                             is_send_email=args.mail,
                             session=session)
     cost = int(time.time() - ts)
-    print('任务完成啦\n总共用了这么长时间:{0}秒'.format(cost))
+    print("Task is completed.\ntotal time: {0}秒".format(cost))
 
 
 if __name__ == '__main__':
